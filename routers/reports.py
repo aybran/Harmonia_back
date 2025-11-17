@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from app.database import get_db
-from app.models.models import User, UserType
-from app.schemas.schemas import ReportsData
-from app.services.auth_service import get_current_user
-from app.services.report_service import generate_reports_data
+from core.database import get_db
+from models.models import User, UserType
+from schemas.schemas import ReportsData
+from services.auth_service import get_current_user
+from services.report_service import generate_reports_data
 
 router = APIRouter(prefix="/reports", tags=["reports"])
 
@@ -19,11 +19,11 @@ async def get_reports(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Apenas psicólogos podem acessar relatórios"
         )
-
+    
     if current_user.id != psychologist_id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Você só pode acessar seus próprios relatórios"
         )
-
+    
     return generate_reports_data(db, psychologist_id)
