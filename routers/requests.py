@@ -15,15 +15,21 @@ async def get_requests(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    if current_user.type != UserType.PSICOLOGO:
+    if current_user.type == UserType.PSICOLOGO:
+        # Psicólogos veem solicitações direcionadas a eles
+        requests = db.query(Request).filter(
+            Request.preferred_psychologist == current_user.id
+        ).all()
+    elif current_user.type == UserType.PACIENTE:
+        # Pacientes veem suas próprias solicitações
+        requests = db.query(Request).filter(
+            Request.patient_email == current_user.email
+        ).all()
+    else:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Apenas psicólogos podem acessar solicitações"
+            detail="Acesso não autorizado"
         )
-    
-    requests = db.query(Request).filter(
-        Request.preferred_psychologist == current_user.id
-    ).all()
     
     # Converte JSON strings de volta para listas
     for req in requests:
@@ -51,6 +57,7 @@ async def create_request(
         )
     
     db_request = Request(
+        patient_id=request_data.patient_id,
         patient_name=request_data.patient_name,
         patient_email=request_data.patient_email,
         patient_phone=request_data.patient_phone,
