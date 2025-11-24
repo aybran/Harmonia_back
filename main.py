@@ -9,7 +9,7 @@ from config import settings
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
-    title="Lunysse API",
+    title="Harmoia API",
     description="Sistema de Agendamento Psicológico com Machine Learning",
     version="2.0.0"
 )
@@ -34,4 +34,4 @@ app.include_router(ml_analysis.router)
 
 @app.get("/")
 async def root():
-    return {"message": "Lunysse API - Sistema de Agendamento Psicológico"}
+    return {"message": "Harmonia API - Sistema de Agendamento Psicológico"}
