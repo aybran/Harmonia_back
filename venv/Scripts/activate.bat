@@ -8,7 +8,7 @@ if defined _OLD_CODEPAGE (
     "%SystemRoot%\System32\chcp.com" 65001 > nul
 )
 
-set VIRTUAL_ENV=D:\Users\983558\OneDrive - SENAC em Minas - EDU\Documentos\GitHub\Harmonia_back\venv
+set VIRTUAL_ENV=D:\Users\1067948\Documents\GitHub\lunysse_backend\venv
 
 if not defined PROMPT set PROMPT=$P$G
 

@@ -38,7 +38,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="D:\Users\983558\OneDrive - SENAC em Minas - EDU\Documentos\GitHub\Harmonia_back\venv"
+VIRTUAL_ENV="D:\Users\1067948\Documents\GitHub\lunysse_backend\venv"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"

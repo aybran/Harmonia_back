@@ -6,6 +6,7 @@ from sib_api_v3_sdk.rest import ApiException
 # CONFIGURAÇÃO DA API
 # =============================
 load_dotenv()
+ 
 def get_email_client():
     """Retorna o cliente configurado para envio de e-mail."""
     api_key = os.getenv("BREVO_API_KEY")  # SEMPRE usar variável de ambiente!
@@ -20,7 +21,9 @@ def get_email_client():
 # FUNÇÃO GENÉRICA DE ENVIO
 # =============================
 def send_email(to_email: str, subject: str, html_content: str,
-               sender_email="no-reply@seusistema.com", sender_name="Lunysse"):
+               sender_email=None, sender_name="Lunysse"):
+    if sender_email is None:
+        sender_email = os.getenv("EMAIL_SENDER")
     """Função genérica para envio de e-mails transacionais."""
     if not to_email:
         raise ValueError("E-mail do destinatário está vazio.")
@@ -38,7 +41,6 @@ def send_email(to_email: str, subject: str, html_content: str,
     except ApiException as e:
         print(f"Erro ao enviar e-mail para {to_email}: {e}")
         return False
- 
  
 # =============================
 # EMAIL: CONFIRMAÇÃO DE AGENDAMENTO
@@ -83,5 +85,56 @@ def send_email_request_accepted(patient_email: str, patient_name: str, psycholog
         sender_email=email,
         sender_name="Sistema de Agendamentos"
     )
+# =============================
+# EMAIL: SOLICITAÇÃO REJEITADA
+# =============================    
+def send_email_request_reject(patient_email: str, patient_name: str, psychologist_name: str):
+    email = os.getenv("EMAIL_DOMAIN")
+    html = f"""
+        <h3>Olá {patient_name},</h3>
+        <p>Sua solicitação foi recusada pelo psicólogo <strong>{psychologist_name}</strong>.</p>
+        <p>Este psicologo nao aceitou sua solicitação, você pode escolher outro psicologo para enviar uma nova solicitação ou tentar novamente a solicitação com o mesmo psicologo.</p>
+        <p>Obrigado por utilizar nossa plataforma.</p>
+    """
  
+    return send_email(
+        to_email=patient_email,
+        subject="Sua Solicitação Foi Negada",
+        html_content=html,
+        sender_email=email,
+        sender_name="Sistema de Agendamentos"
+    )
+# =============================
+# EMAIL: SOLICITAÇÃO para psicologo
+# =============================    
+def send_email_new_request_to_psychologist(psychologist_email: str, psychologist_name: str, patient_name: str):
+    email = os.getenv("EMAIL_DOMAIN")
+    html = f"""
+        <h3>Olá psicologo {psychologist_name},</h3>
+        <p>Você possui uma nova solicitação de paciente no sistema, o  <strong>{patient_name}</strong> deseja ser atendido por você.</p>
+        <p>Você pode acessar o sistema pelo link abaixo e aceitar ou recusar o paciente.</p>
+        <button
+            onclick="window.location.href='https://lunysse.vercel.app/login'"
+            style="
+                background-color: #4A4AFF;
+                color: white;
+                padding: 10px 20px;
+                border: none;
+                border-radius: 6px;
+                cursor: pointer;
+                font-size: 16px;
+                font-weight: bold;
+            ">Entrar</button>
+        <p>Obrigado por utilizar nossa plataforma.</p>
+    """
+    return send_email(
+        to_email=psychologist_email,
+        subject="Nova solicitação de paciente no sistema",
+        html_content=html,
+        sender_email=email,
+        sender_name="Sistema de Agendamentos"
+    )
+ 
+ 
+
  

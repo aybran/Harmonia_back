@@ -1,37 +1,41 @@
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routers import auth, patients, appointments, requests, reports, psychologists, ml_analysis
-from core.database import engine
-from models import models
-from config import settings
+from core.database import engine, Base
+from routers import (auth, patients, psychologists, appointments, requests, reports,)
+from dotenv import load_dotenv
 
-# Criar tabelas
-models.Base.metadata.create_all(bind=engine)
+# Carrega variáveis de ambiente
+load_dotenv()
 
 app = FastAPI(
-    title="Harmoia API",
-    description="Sistema de Agendamento Psicológico com Machine Learning",
-    version="2.0.0"
+    title="Lunysse API",
+    description="API para sistema de agendamento psicológico",
+    version="1.0.0"
 )
 
-# CORS
+# Configuração CORS mais segura
+cors_origins = os.getenv("CORS_ORIGINS", "http://localhost:3000").split(",")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.CORS_ORIGINS,
+    allow_origins=cors_origins,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE"],
     allow_headers=["*"],
 )
 
-# Routers
+# Inclui os routers
 app.include_router(auth.router)
 app.include_router(patients.router)
+app.include_router(psychologists.router)
 app.include_router(appointments.router)
 app.include_router(requests.router)
 app.include_router(reports.router)
-app.include_router(psychologists.router)
-app.include_router(ml_analysis.router)
 
 @app.get("/")
 async def root():
-    return {"message": "Harmonia API - Sistema de Agendamento Psicológico"}
+    return {"message": "Lunysse API - Sistema de Agendamento Psicológico"}
+
+@app.get("/health")
+async def health_check():
+    return {"status": "healthy"}
